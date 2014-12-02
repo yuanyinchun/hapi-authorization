@@ -2147,7 +2147,7 @@ describe('hapi-authorization', function() {
 				});
 			});
 
-			it.only('Restricts access to protected route for multiple authorized roles that are not defined as plugin roles', function(done) {
+			it('Restricts access to protected route for multiple authorized roles that are not defined as plugin roles', function(done) {
 				var server = new Hapi.Server();
 				server.auth.scheme('custom', internals.authSchemaWithRole);
 				server.auth.strategy('default', 'custom', true, {});
@@ -2160,8 +2160,7 @@ describe('hapi-authorization', function() {
 				server.pack.register(plugin, {}, function(err) {
 					server.inject({method: 'GET', url: '/', credentials: {role: 'ADMIN'}}, function(res) {
 						internals.asyncCheck(function() {
-							expect(res.statusCode).to.equal(403);
-							expect(res.result.message).to.equal("Unauthorized");
+							expect(res.payload).to.equal('Authorized');
 						}, done);
 					});
 				});
