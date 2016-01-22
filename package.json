@@ -1,6 +1,6 @@
 {
   "name": "hapi-authorization",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "ACL support for hapijs apps",
   "main": "index.js",
   "scripts": {
