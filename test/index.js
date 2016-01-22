@@ -1128,6 +1128,148 @@ describe('hapi-authorization', function() {
 
 		});
 
+   describe('Joi validator with aclQuery', function() {
+
+    it('returns an error when query parameter is missing', function(done) {
+      var server = new Hapi.Server();
+      server.connection();
+      server.auth.scheme('custom', internals.authSchema);
+      server.auth.strategy('default', 'custom', true, {});
+
+      server.route({ method: 'GET', path: '/', config: {
+        validate: {
+        	query: {
+          	name: Joi.string().required()
+          }
+        },
+        auth: 'default',
+        plugins: {'hapiAuthorization': {
+        validateEntityAcl: true,
+        entityUserField: 'creator',
+        aclQueryParam: 'name',
+        paramSource: 'query',
+        aclQuery: function(name, request, cb) {
+          cb(null, {creator: '1', name: 'Hello' + name});
+        }
+      }},
+      handler: function (request, reply) { reply("Authorized");}
+    }});
+    server.register(plugin, {}, function(err) {
+			server.inject({method: 'GET', url: '/', credentials: {role: 'ADMIN', _id: '1'}}, function(res) {
+                       internals.asyncCheck(function() {
+                               expect(res.statusCode).to.equal(400);
+                               expect(res.result.message).to.equal("child \"name\" fails because [name is required]");
+                       }, done);
+               });
+       });
+     });
+
+     it('validates query parameter', function(done) {
+             var server = new Hapi.Server();
+             server.connection();
+             server.auth.scheme('custom', internals.authSchema);
+             server.auth.strategy('default', 'custom', true, {});
+
+             server.route({ method: 'GET', path: '/', config: {
+                     validate: {
+                             query: {
+                                     name: Joi.string().required()
+                             }
+                     },
+                     auth: 'default',
+                     plugins: {'hapiAuthorization': {
+                             validateEntityAcl: true,
+                             entityUserField: 'creator',
+                             aclQueryParam: 'name',
+                             paramSource: 'query',
+                             aclQuery: function(name, request, cb) {
+                                     cb(null, {creator: '1', name: 'Hello' + name});
+                             }
+                     }},
+                     handler: function (request, reply) { reply("Authorized");}
+             }});
+             server.register(plugin, {}, function(err) {
+                     server.inject({method: 'GET', url: '/?name=John Doe', credentials: {role: 'ADMIN', _id: '1'}}, function(res) {
+                             internals.asyncCheck(function() {
+                                     expect(res.statusCode).to.equal(200);
+                                     expect(res.result).to.equal("Authorized");
+                             }, done);
+                     });
+             });
+     });
+
+     it('returns an error when payload parameter is missing', function(done) {
+             var server = new Hapi.Server();
+             server.connection();
+             server.auth.scheme('custom', internals.authSchema);
+             server.auth.strategy('default', 'custom', true, {});
+
+             server.route({ method: 'POST', path: '/', config: {
+                     validate: {
+                             payload: {
+                                     name: Joi.string().required()
+                             }
+                     },
+                     auth: 'default',
+                     plugins: {'hapiAuthorization': {
+                             validateEntityAcl: true,
+                             entityUserField: 'creator',
+                             aclQueryParam: 'name',
+                             paramSource: 'payload',
+                             aclQuery: function(name, request, cb) {
+                                     cb(null, {creator: '1', name: 'Hello' + name});
+                             }
+                     }},
+                     handler: function (request, reply) { reply("Authorized");}
+             }});
+             server.register(plugin, {}, function(err) {
+                     server.inject({method: 'POST', url: '/', payload: {}, credentials: {role: 'ADMIN', _id: '1'}}, function(res) {
+                             internals.asyncCheck(function() {
+                                     expect(res.statusCode).to.equal(400);
+                                     expect(res.result.message).to.equal("child \"name\" fails because [name is required]");
+                             }, done);
+                     });
+             });
+     });
+
+     it('validates payload parameter', function(done) {
+             var server = new Hapi.Server();
+             server.connection();
+             server.auth.scheme('custom', internals.authSchema);
+             server.auth.strategy('default', 'custom', true, {});
+
+             server.route({ method: 'POST', path: '/', config: {
+                     validate: {
+                             payload: {
+                                     name: Joi.string().required()
+                             }
+                     },
+                     auth: 'default',
+                     plugins: {'hapiAuthorization': {
+                             validateEntityAcl: true,
+                             entityUserField: 'creator',
+                             aclQueryParam: 'name',
+                             paramSource: 'payload',
+                             aclQuery: function(name, request, cb) {
+                                     cb(null, {creator: '1', name: 'Hello' + name});
+                             }
+                     }},
+                     handler: function (request, reply) { reply("Authorized");}
+             }});
+             server.register(plugin, {}, function(err) {
+                     server.inject({method: 'POST', url: '/', payload: { name: "John Doe"}, credentials: {role: 'ADMIN', _id: '1'}}, function(res) {
+                             internals.asyncCheck(function() {
+                                     expect(res.statusCode).to.equal(200);
+                                     expect(res.result).to.equal("Authorized");
+                             }, done);
+                     });
+             });
+     });
+
+   });
+
+
+
 	});
 
 	describe('Initialize with roles', function() {
