@@ -199,7 +199,7 @@ You must define your auth strategy before defining your routes, otherwise the ro
 ## Route config of supported parameters:
 * `role` - `String`: enforces that only users that have this role can access the route
 * `roles` - `Array`: enforces that only users that have these roles can access the route
-* `aclQuery` - `Function`: fetches an entity using the provided query, it allows the plugin to verify that the authenticated user has permissions to access this entity. the function signature should be `function(parameter, cb)`.
+* `aclQuery` - `Function`: fetches an entity using the provided query, it allows the plugin to verify that the authenticated user has permissions to access this entity. the function signature should be `function(parameter, request, cb)`.
 * `aclQueryParam` - `String`: The parameter key that will be used to fetch the entity. default: 'id'
 * `paramSource` - `String`: The source of the acl parameter, allowed values: payload, params, query.
 * `validateEntityAcl` - `Boolean`: Should the plugin validate if the user has access to the entity. if true, validateAclMethod is required.
