@@ -1,6 +1,6 @@
 {
-  "name": "sesame-hapi-authorization",
-  "version": "4.0.2",
+  "name": "@sesame/hapi-authorization",
+  "version": "4.0.3",
   "description": "ACL support for hapijs apps",
   "main": "index.js",
   "scripts": {
